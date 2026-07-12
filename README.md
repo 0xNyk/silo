@@ -11,6 +11,25 @@
   <a href="https://github.com/0xNyk/silo/actions"><img src="https://img.shields.io/github/actions/workflow/status/0xNyk/silo/ci.yml?style=flat-square&label=ci&labelColor=0a0a0a" alt="ci"/></a>
 </p>
 
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
+```
+
+Downloads the latest release binary (SHA-256 checked when available), installs to `~/.local/bin/silo`, falls back to `cargo install` if no prebuild matches your OS.
+
+```bash
+# pin version / install dir
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | VERSION=v0.1.1 bash
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | INSTALL_DIR=~/.local/bin bash
+
+# force source build
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | SILO_FORCE_CARGO=1 bash
+```
+
+Requires [Claude Code](https://code.claude.com) on `PATH` to run profiles.
+
 ```
 $ silo init --count 10                 # s01..s10
 $ silo profile create personal work client-a client-b max-1 max-2
@@ -35,27 +54,6 @@ silo does the boring correct thing:
 4. Doctor that says when macOS Keychain is still **shared**
 
 It is not a multi-Max auto-rotator. That is intentional. You can still **hold** many subscriptions — you just switch silos deliberately.
-
-## Install
-
-Requires [Claude Code](https://code.claude.com) on `PATH`. Binary name: `silo`.
-
-### Prebuilt (macOS Apple Silicon)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh | bash
-```
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh \
-  | VERSION=v0.1.0 INSTALL_DIR=~/.local/bin bash
-```
-
-### From source
-
-```bash
-cargo install --git https://github.com/0xNyk/silo --locked
-```
 
 ## Daily use
 
