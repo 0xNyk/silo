@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="silo">
+  <rect width="256" height="256" rx="48" fill="#0a0a0a"/>
+  <!-- two isolated cylinders / silos -->
+  <rect x="56" y="72" width="56" height="112" rx="28" fill="none" stroke="#fafafa" stroke-width="8"/>
+  <rect x="144" y="72" width="56" height="112" rx="28" fill="none" stroke="#fafafa" stroke-width="8"/>
+  <line x1="84" y1="200" x2="84" y2="216" stroke="#fafafa" stroke-width="8" stroke-linecap="round"/>
+  <line x1="172" y1="200" x2="172" y2="216" stroke="#fafafa" stroke-width="8" stroke-linecap="round"/>
+  <!-- gap between them is the product -->
+</svg>

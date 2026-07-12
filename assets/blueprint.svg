@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-label="silo architecture">
+  <rect width="1200" height="640" fill="#0a0a0a"/>
+  <text x="48" y="52" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24" font-weight="600">silo</text>
+  <text x="120" y="52" fill="#737373" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">architecture</text>
+  <text x="48" y="78" fill="#525252" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">CLAUDE_CONFIG_DIR isolation · no vault swap · personal / work first</text>
+
+  <rect x="48" y="110" width="340" height="140" rx="8" fill="#141414" stroke="#262626"/>
+  <text x="68" y="140" fill="#fafafa" font-family="ui-monospace, Menlo, monospace" font-size="13">1  resolve</text>
+  <text x="68" y="168" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">.claude-profile · walk parents</text>
+  <text x="68" y="188" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">silo use · silo run · default</text>
+  <text x="68" y="220" fill="#a3a3a3" font-family="ui-monospace, Menlo, monospace" font-size="12">eval "$(silo hook)"</text>
+
+  <path d="M388 180 H430" stroke="#404040" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <rect x="430" y="110" width="340" height="140" rx="8" fill="#141414" stroke="#404040"/>
+  <text x="450" y="140" fill="#fafafa" font-family="ui-monospace, Menlo, monospace" font-size="13">2  launch</text>
+  <text x="450" y="168" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">unset CLAUDE_* ANTHROPIC_*</text>
+  <text x="450" y="188" fill="#e5e5e5" font-family="ui-monospace, Menlo, monospace" font-size="12">CLAUDE_CONFIG_DIR=…/work</text>
+  <text x="450" y="220" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">exec claude</text>
+
+  <path d="M770 180 H812" stroke="#404040" stroke-width="1.5"/>
+
+  <rect x="812" y="110" width="340" height="140" rx="8" fill="#141414" stroke="#262626"/>
+  <text x="832" y="140" fill="#fafafa" font-family="ui-monospace, Menlo, monospace" font-size="13">3  doctor</text>
+  <text x="832" y="168" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">class: shared | isolated | unknown</text>
+  <text x="832" y="188" fill="#a3a3a3" font-family="ui-monospace, Menlo, monospace" font-size="12">shared → no dual OAuth</text>
+  <text x="832" y="220" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">never prints tokens</text>
+
+  <rect x="48" y="290" width="530" height="200" rx="8" fill="#0f0f0f" stroke="#262626"/>
+  <text x="68" y="324" fill="#fafafa" font-family="ui-monospace, Menlo, monospace" font-size="14">~/.silo/profiles/personal</text>
+  <text x="68" y="356" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">private  credentials · history · projects</text>
+  <text x="68" y="378" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">private  settings.local · .env · caches</text>
+  <text x="68" y="410" fill="#a3a3a3" font-family="ui-monospace, Menlo, monospace" font-size="12">opt-in only  skills · commands · agents</text>
+  <text x="68" y="450" fill="#525252" font-family="ui-monospace, Menlo, monospace" font-size="12">silo run personal</text>
+
+  <rect x="622" y="290" width="530" height="200" rx="8" fill="#0f0f0f" stroke="#262626"/>
+  <text x="642" y="324" fill="#fafafa" font-family="ui-monospace, Menlo, monospace" font-size="14">~/.silo/profiles/work</text>
+  <text x="642" y="356" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">private  credentials · history · projects</text>
+  <text x="642" y="378" fill="#737373" font-family="ui-monospace, Menlo, monospace" font-size="12">private  settings.local · .env · caches</text>
+  <text x="642" y="410" fill="#a3a3a3" font-family="ui-monospace, Menlo, monospace" font-size="12">same opt-in share list</text>
+  <text x="642" y="450" fill="#525252" font-family="ui-monospace, Menlo, monospace" font-size="12">cd ~/work &amp;&amp; silo link work</text>
+
+  <rect x="48" y="520" width="1104" height="80" rx="8" fill="#0c0c0c" stroke="#1f1f1f"/>
+  <text x="68" y="552" fill="#a3a3a3" font-family="ui-monospace, Menlo, monospace" font-size="12">not in scope</text>
+  <text x="68" y="576" fill="#525252" font-family="ui-monospace, Menlo, monospace" font-size="12">Keychain vault swap · multi-Max auto-rotate · ~/.claude symlink races · OAuth proxy pools · token export</text>
+
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#525252"/>
+    </marker>
+  </defs>
+</svg>
