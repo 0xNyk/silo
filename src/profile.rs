@@ -169,7 +169,7 @@ fn list_profiles() -> Result<()> {
         let creds = if has_credentials(&paths::profile_dir(&name)?) {
             "yes"
         } else {
-            "—"
+            "need-login"
         };
         let def = if cfg.default_profile.as_deref() == Some(name.as_str()) {
             " *"
@@ -266,10 +266,31 @@ pub fn require_profile(name: &str) -> Result<PathBuf> {
     Ok(dir)
 }
 
+/// Best-effort "looks logged in" signal without reading secret values.
+/// macOS may keep OAuth only in Keychain for some setups — doctor notes that.
 pub fn has_credentials(dir: &Path) -> bool {
-    dir.join(".credentials.json").is_file()
-        || dir.join(".env").is_file()
-        || dir.join(".claude.json").is_file()
+    if dir.join(".credentials.json").is_file() {
+        return true;
+    }
+    if dir.join(".env").is_file() {
+        return true;
+    }
+    // .claude.json alone is weak; only count if non-trivial size (session/account meta)
+    let claude_json = dir.join(".claude.json");
+    if let Ok(meta) = fs::metadata(&claude_json) {
+        if meta.len() > 64 {
+            return true;
+        }
+    }
+    false
+}
+
+pub fn creds_label(dir: &Path) -> &'static str {
+    if has_credentials(dir) {
+        "creds~"
+    } else {
+        "need-login"
+    }
 }
 
 pub fn cmd_default(action: DefaultCmd) -> Result<()> {

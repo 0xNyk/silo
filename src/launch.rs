@@ -80,6 +80,7 @@ pub fn cmd_use(args: UseArgs) -> Result<()> {
 
 pub fn cmd_auth(action: AuthCmd) -> Result<()> {
     match action {
+        AuthCmd::Status => crate::doctor::print_login_checklist(),
         AuthCmd::Login { name } => {
             let dir = profile::require_profile(&name)?;
             let meta = profile::load_meta(&name)?;

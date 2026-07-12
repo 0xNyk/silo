@@ -44,7 +44,8 @@ pub fn cmd_status() -> Result<()> {
     Ok(())
 }
 
-pub fn cmd_doctor(args: DoctorArgs) -> Result<()> {
+/// Returns process exit code: 0 clean, 1 warnings, 2 errors.
+pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
     let mut warnings = 0u32;
     let mut errors = 0u32;
 
@@ -107,16 +108,15 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<()> {
             if args.fix_perms {
                 fix_private_dir(&dir)?;
             }
-            let creds = if profile::has_credentials(&dir) {
-                "creds~"
-            } else {
-                "no-creds"
-            };
+            let creds = profile::creds_label(&dir);
+            if creds == "need-login" {
+                warnings += 1;
+            }
             let mode = profile::load_meta(&name)
                 .map(|m| m.auth_mode.as_str().to_string())
                 .unwrap_or_else(|_| "?".into());
             println!(
-                "[ OK ] profile/{name:<18} {mode:<12} {creds}  {}",
+                "[ OK ] profile/{name:<18} {mode:<12} {creds:<10}  {}",
                 dir.display()
             );
             for risky in ["projects", "history.jsonl", ".credentials.json"] {
@@ -170,14 +170,52 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<()> {
         }
     }
 
+    if args.checklist {
+        print_login_checklist()?;
+    }
+
     println!();
-    if errors > 0 {
+    let code = if errors > 0 {
         println!("doctor: {errors} error(s), {warnings} warning(s)");
-        std::process::exit(2);
+        2
     } else if warnings > 0 {
         println!("doctor: {warnings} warning(s)");
+        1
     } else {
         println!("doctor: clean");
+        0
+    };
+    Ok(code)
+}
+
+pub fn print_login_checklist() -> Result<()> {
+    let names = paths::list_profile_names()?;
+    if names.is_empty() {
+        println!("(no profiles — run silo bootstrap / silo init)");
+        return Ok(());
+    }
+    println!();
+    println!("=== login checklist (human / browser OAuth) ===");
+    let mut pending = 0u32;
+    for name in &names {
+        let dir = paths::profile_dir(name)?;
+        if profile::has_credentials(&dir) {
+            println!("  [done] silo auth login {name}");
+        } else {
+            println!("  [    ] silo auth login {name}");
+            pending += 1;
+        }
+    }
+    if pending > 0 {
+        println!();
+        println!(
+            "{pending} profile(s) still need login. Agents: run each command and wait for the user to finish the browser flow."
+        );
+    } else {
+        println!();
+        println!(
+            "all profiles look logged in (file signals). Re-run `silo doctor --keychain` after Claude Code upgrades."
+        );
     }
     Ok(())
 }

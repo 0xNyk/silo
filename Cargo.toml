@@ -1,6 +1,6 @@
 [package]
 name = "silo"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "As many isolated Claude Code profiles as you need — official CLAUDE_CONFIG_DIR primitives, no credential vault swap"
 license = "MIT"
@@ -19,6 +19,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["derive", "env"] }
+clap_complete = "4"
 dirs = "6"
 serde = { version = "1", features = ["derive"] }
 toml = "0.8"

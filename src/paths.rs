@@ -8,7 +8,13 @@ pub fn home_dir() -> Result<PathBuf> {
     dirs::home_dir().context("cannot resolve home directory")
 }
 
+/// Root for config + profiles. Override with `SILO_HOME` (tests / portable installs).
 pub fn silo_root() -> Result<PathBuf> {
+    if let Ok(v) = std::env::var("SILO_HOME") {
+        if !v.is_empty() {
+            return Ok(PathBuf::from(v));
+        }
+    }
     Ok(home_dir()?.join(ROOT_DIRNAME))
 }
 
@@ -27,6 +33,15 @@ pub fn profile_dir(name: &str) -> Result<PathBuf> {
 
 pub fn profile_meta_path(name: &str) -> Result<PathBuf> {
     Ok(profile_dir(name)?.join("silo.toml"))
+}
+
+pub fn bin_dir() -> Result<PathBuf> {
+    if let Ok(v) = std::env::var("SILO_BIN_DIR") {
+        if !v.is_empty() {
+            return Ok(PathBuf::from(v));
+        }
+    }
+    Ok(home_dir()?.join(".local/bin"))
 }
 
 pub fn validate_name(name: &str) -> Result<()> {
@@ -97,4 +112,54 @@ pub fn read_marker(path: &Path) -> Result<String> {
     let raw = std::fs::read_to_string(path)
         .with_context(|| format!("read {}", path.display()))?;
     Ok(raw.trim().to_string())
+}
+
+pub fn list_profile_names() -> Result<Vec<String>> {
+    let dir = profiles_dir()?;
+    if !dir.is_dir() {
+        return Ok(vec![]);
+    }
+    let mut names: Vec<_> = std::fs::read_dir(dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir())
+        .filter_map(|e| e.file_name().into_string().ok())
+        .collect();
+    names.sort();
+    Ok(names)
+}
+
+pub fn require_exists(name: &str) -> Result<PathBuf> {
+    let dir = profile_dir(name)?;
+    if !dir.exists() {
+        bail!("profile `{name}` not found — create with `silo profile create {name}`");
+    }
+    Ok(dir)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_name_ok() {
+        assert!(validate_name("personal").is_ok());
+        assert!(validate_name("s01").is_ok());
+        assert!(validate_name("client_a-1").is_ok());
+    }
+
+    #[test]
+    fn validate_name_bad() {
+        assert!(validate_name("../x").is_err());
+        assert!(validate_name("a/b").is_err());
+        assert!(validate_name("").is_err());
+        assert!(validate_name("has space").is_err());
+    }
+
+    #[test]
+    fn silo_home_override() {
+        let tmp = std::env::temp_dir().join(format!("silo-test-{}", std::process::id()));
+        std::env::set_var("SILO_HOME", &tmp);
+        assert_eq!(silo_root().unwrap(), tmp);
+        std::env::remove_var("SILO_HOME");
+    }
 }
