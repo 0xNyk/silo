@@ -40,7 +40,7 @@ pub fn cmd_status() -> Result<()> {
     } else {
         0
     };
-    println!("profiles: {n}");
+    println!("profiles: {n}  (unlimited named silos; soft bulk-create cap {})", crate::config::MAX_BULK_CREATE);
     Ok(())
 }
 
@@ -164,7 +164,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<()> {
         }
         if report.class == keychain::KeychainClass::Shared {
             println!(
-                "[WARN] parallel dual OAuth           UNSAFE — sequential or setup-token/API for 2nd"
+                "[WARN] parallel multi OAuth          UNSAFE — one OAuth silo at a time, or setup-token/API for extras"
             );
             warnings += 1;
         }

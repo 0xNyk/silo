@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>silo</strong> — isolated Claude Code profiles for personal and work
+  <strong>silo</strong> — as many isolated Claude Code profiles as you need
 </p>
 
 <p align="center">
@@ -12,69 +12,67 @@
 </p>
 
 ```
-$ silo init --with-defaults
-$ silo auth login personal
-$ silo auth login work
-$ silo link work                 # in a client repo
-$ eval "$(silo hook)"            # optional: auto-activate on cd
-$ silo run personal              # or: silo use work && claude
+$ silo init --count 10                 # s01..s10
+$ silo profile create personal work client-a client-b max-1 max-2
+$ silo auth login s01
+$ silo link client-a                   # in that repo
+$ eval "$(silo hook)"                  # optional auto-activate on cd
+$ silo run s07
 $ silo doctor --keychain
 ```
 
-Keep identities apart. Share skills only when you choose. Never dump a token vault.
+**Not limited to two.** Personal + work is a common start. Ten Max subs, a dozen clients, or one-off experiment silos — same model: one directory, one identity, clean launch.
 
 ## Why
 
-Claude Code is one identity per process. People solve that with `/login` thrash, Keychain swap scripts, or tools that share history between “profiles.”
+Claude Code is one identity per process. People thrash `/login`, swap Keychain vaults, or share history between “profiles.”
 
 silo does the boring correct thing:
 
-1. One directory per profile (`CLAUDE_CONFIG_DIR`)
+1. One directory per named silo (`CLAUDE_CONFIG_DIR`)
 2. Clean environment, then `exec claude`
 3. Project pin via `.claude-profile`
-4. Doctor that tells you when macOS Keychain is still **shared**
+4. Doctor that says when macOS Keychain is still **shared**
 
-It is not a multi-Max auto-rotator. That is intentional.
+It is not a multi-Max auto-rotator. That is intentional. You can still **hold** many subscriptions — you just switch silos deliberately.
 
 ## Install
 
 Requires [Claude Code](https://code.claude.com) on `PATH`. Binary name: `silo`.
 
-### Prebuilt (macOS / Linux x86_64)
+### Prebuilt (macOS Apple Silicon)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh | bash
 ```
-
-Pin a version or install dir:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh \
   | VERSION=v0.1.0 INSTALL_DIR=~/.local/bin bash
 ```
 
-The script verifies SHA-256 when `checksums.txt` is present on the release.
-
 ### From source
 
 ```bash
 cargo install --git https://github.com/0xNyk/silo --locked
-# or
-git clone https://github.com/0xNyk/silo && cd silo && cargo install --path . --locked
 ```
 
 ## Daily use
 
 | Goal | Command |
 |---|---|
-| Create personal + work | `silo init --with-defaults` |
-| Log in a profile | `silo auth login work` |
-| One-off session | `silo run work` |
+| Ten numbered silos | `silo init --count 10` |
+| Named batch | `silo profile create a b c d e f g h i j` |
+| Starter personal + work | `silo init --with-defaults` |
+| Custom names on init | `silo init --names personal,work,c1,c2,c3,c4,c5,c6,c7,c8` |
+| Log in a silo | `silo auth login s03` |
+| One-off session | `silo run client-a` |
 | This shell only | `eval "$(silo use work)"` then `claude` |
-| Pin a repo | `silo link work` |
+| Pin a repo | `silo link client-a` |
 | Auto-pin on `cd` | `eval "$(silo hook)"` in `~/.zshrc` |
 | Share skills (opt-in) | `silo share on skills` |
-| Check safety | `silo doctor --keychain` |
+| List everything | `silo profile list` |
+| Safety check | `silo doctor --keychain` |
 
 ### Layout
 
@@ -82,9 +80,15 @@ git clone https://github.com/0xNyk/silo && cd silo && cargo install --path . --l
 ~/.silo/
   config.toml
   profiles/
-    personal/          # CLAUDE_CONFIG_DIR for personal
-    work/              # CLAUDE_CONFIG_DIR for work
+    personal/
+    work/
+    client-a/
+    s01/
+    s02/
+    …                 # as many as you create
 ```
+
+No hard product cap. Bulk create has a **soft** safety limit of 256 per command (typo guard).
 
 ### What is private vs shared
 
@@ -111,17 +115,17 @@ git clone https://github.com/0xNyk/silo && cd silo && cargo install --path . --l
   exec claude
 ```
 
-Auth modes per profile: `oauth` (default), `setup-token`, `api-key`, `bedrock`, `vertex`, `foundry`.
+Auth modes per silo: `oauth` (default), `setup-token`, `api-key`, `bedrock`, `vertex`, `foundry`.
 
 ## Doctor and macOS Keychain
 
 ```
 $ silo doctor --keychain
 [ -- ] class                         shared
-[WARN] parallel dual OAuth           UNSAFE
+[WARN] parallel multi OAuth          UNSAFE
 ```
 
-On several Claude Code builds, OAuth still uses a single Keychain service. When class is `shared`, run profiles **sequentially**, or put the second concurrent process on `setup-token` / API key.
+When class is `shared`, run **one OAuth silo at a time**, or put extras on `setup-token` / API key. Holding 10 logged-in silos on disk is fine; concurrent OAuth processes may not be.
 
 silo never prints tokens and never runs `security … -g`.
 
@@ -132,20 +136,17 @@ silo never prints tokens and never runs `security … -g`.
 - Symlinking `~/.claude` as the concurrency model
 - Local OAuth proxy pools
 - Exporting multi-account credential packs
-
-If you need max convenience + quota auto-switch, use something purpose-built for that and accept the risk surface. silo optimizes for **correct isolation**.
+- Artificial “only two profiles” product limits
 
 ## Brand
 
 | | |
 |---|---|
 | Name | **silo** |
-| Mark | two outlined capsules with a hard gap |
+| Mark | many outlined capsules (a field of silos, not a pair) |
 | Palette | `#0a0a0a` · `#fafafa` · `#737373` |
 | Type | system monospace |
-| Assets | `assets/logo.svg` · `assets/header.svg` · `assets/blueprint.svg` · `assets/header.png` · `assets/og.png` |
-
-No purple gradients. No “AI product” chrome. Isolation is the metaphor.
+| Assets | `assets/logo.svg` · `assets/header.svg` · `assets/blueprint.svg` |
 
 ## Security
 

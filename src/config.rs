@@ -1,9 +1,12 @@
 use crate::cli::InitArgs;
 use crate::paths::{self, ensure_dir};
 use crate::profile::{self, AuthModeMeta};
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+
+/// Soft upper bound to catch typos (e.g. --count 100000). Not a product limit.
+pub const MAX_BULK_CREATE: u32 = 256;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -82,31 +85,99 @@ pub fn cmd_init(args: InitArgs) -> Result<()> {
     println!("profiles:    {}", paths::profiles_dir()?.display());
     println!("source_dir:  {}", source_path(&cfg).display());
     println!();
-    println!("Share is off by default. Credentials stay with Claude Code — silo never vault-swaps tokens.");
+    println!("As many silos as you want. Share off by default. Claude Code owns OAuth — silo never vault-swaps tokens.");
+
+    let mut created: Vec<String> = Vec::new();
+    let mut to_create: Vec<String> = Vec::new();
 
     if args.with_defaults {
-        for name in ["personal", "work"] {
-            if !paths::profile_dir(name)?.exists() {
-                profile::create_profile(name, AuthModeMeta::Oauth, false, &cfg)?;
-                println!("created profile: {name}");
-            } else {
-                println!("profile exists:  {name}");
-            }
+        to_create.extend(["personal".into(), "work".into()]);
+    }
+    for n in &args.names {
+        let t = n.trim();
+        if !t.is_empty() {
+            to_create.push(t.to_string());
         }
-        if cfg.default_profile.is_none() {
-            cfg.default_profile = Some("personal".into());
+    }
+    if let Some(count) = args.count {
+        if count == 0 {
+            bail!("--count must be >= 1");
+        }
+        if count > MAX_BULK_CREATE {
+            bail!("--count {count} exceeds soft limit {MAX_BULK_CREATE} (raise only if intentional)");
+        }
+        let width = count.to_string().len().max(2);
+        for i in 1..=count {
+            to_create.push(format!("{prefix}{i:0width$}", prefix = args.prefix, width = width));
+        }
+    }
+
+    // de-dupe preserving order
+    let mut seen = std::collections::HashSet::new();
+    to_create.retain(|n| seen.insert(n.clone()));
+
+    for name in &to_create {
+        if paths::profile_dir(name)?.exists() {
+            println!("profile exists:  {name}");
+        } else {
+            profile::create_profile(name, AuthModeMeta::Oauth, false, &cfg)?;
+            println!("created profile: {name}");
+            created.push(name.clone());
+        }
+    }
+
+    if cfg.default_profile.is_none() {
+        let def = if paths::profile_dir("personal")?.exists() {
+            Some("personal".into())
+        } else {
+            first_profile_name()?
+        };
+        if let Some(d) = def {
+            cfg.default_profile = Some(d.clone());
             save(&cfg)?;
-            println!("default profile: personal");
+            println!("default profile: {d}");
         }
-    } else {
+    }
+
+    if to_create.is_empty() {
         println!();
-        println!("Next:");
-        println!("  silo profile create personal");
-        println!("  silo profile create work");
-        println!("  silo auth login personal");
-        println!("  silo auth login work");
-        println!("  silo link work          # inside a work repo");
+        println!("Next (any number of silos):");
+        println!("  silo profile create personal work client-a client-b");
+        println!("  silo init --count 10              # s01..s10");
+        println!("  silo init --names a,b,c,d,e,f,g,h,i,j");
+        println!("  silo auth login <name>");
+        println!("  silo link <name>                  # pin a repo");
         println!("  silo doctor --keychain");
+    } else {
+        let total = count_profiles()?;
+        println!();
+        println!("profiles ready: {} total under {}", total, paths::profiles_dir()?.display());
+        println!("login each: silo auth login <name>");
     }
     Ok(())
+}
+
+fn first_profile_name() -> Result<Option<String>> {
+    let dir = paths::profiles_dir()?;
+    if !dir.is_dir() {
+        return Ok(None);
+    }
+    let mut names: Vec<_> = std::fs::read_dir(dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir())
+        .filter_map(|e| e.file_name().into_string().ok())
+        .collect();
+    names.sort();
+    Ok(names.into_iter().next())
+}
+
+fn count_profiles() -> Result<usize> {
+    let dir = paths::profiles_dir()?;
+    if !dir.is_dir() {
+        return Ok(0);
+    }
+    Ok(std::fs::read_dir(dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir())
+        .count())
 }

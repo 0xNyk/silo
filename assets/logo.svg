@@ -1,9 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="silo">
   <rect width="256" height="256" rx="48" fill="#0a0a0a"/>
-  <!-- two isolated cylinders / silos -->
-  <rect x="56" y="72" width="56" height="112" rx="28" fill="none" stroke="#fafafa" stroke-width="8"/>
-  <rect x="144" y="72" width="56" height="112" rx="28" fill="none" stroke="#fafafa" stroke-width="8"/>
-  <line x1="84" y1="200" x2="84" y2="216" stroke="#fafafa" stroke-width="8" stroke-linecap="round"/>
-  <line x1="172" y1="200" x2="172" y2="216" stroke="#fafafa" stroke-width="8" stroke-linecap="round"/>
-  <!-- gap between them is the product -->
+  <!-- ten isolated silos in two rows — not just two -->
+  <g fill="none" stroke="#fafafa" stroke-width="5" stroke-linecap="round">
+    <!-- row 1: 5 -->
+    <rect x="28"  y="56" width="28" height="64" rx="14"/>
+    <rect x="68"  y="56" width="28" height="64" rx="14"/>
+    <rect x="108" y="56" width="28" height="64" rx="14"/>
+    <rect x="148" y="56" width="28" height="64" rx="14"/>
+    <rect x="188" y="56" width="28" height="64" rx="14"/>
+    <line x1="42"  y1="128" x2="42"  y2="140"/>
+    <line x1="82"  y1="128" x2="82"  y2="140"/>
+    <line x1="122" y1="128" x2="122" y2="140"/>
+    <line x1="162" y1="128" x2="162" y2="140"/>
+    <line x1="202" y1="128" x2="202" y2="140"/>
+    <!-- row 2: 5 -->
+    <rect x="28"  y="156" width="28" height="64" rx="14"/>
+    <rect x="68"  y="156" width="28" height="64" rx="14"/>
+    <rect x="108" y="156" width="28" height="64" rx="14"/>
+    <rect x="148" y="156" width="28" height="64" rx="14"/>
+    <rect x="188" y="156" width="28" height="64" rx="14"/>
+    <line x1="42"  y1="228" x2="42"  y2="236"/>
+    <line x1="82"  y1="228" x2="82"  y2="236"/>
+    <line x1="122" y1="228" x2="122" y2="236"/>
+    <line x1="162" y1="228" x2="162" y2="236"/>
+    <line x1="202" y1="228" x2="202" y2="236"/>
+  </g>
 </svg>

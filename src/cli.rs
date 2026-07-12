@@ -3,10 +3,10 @@ use clap::{Parser, Subcommand, ValueEnum};
 #[derive(Parser, Debug)]
 #[command(
     name = "silo",
-    about = "Isolated Claude Code profiles for personal and work",
-    long_about = "Keep personal and work Claude Code identities apart.\n\
-Uses official CLAUDE_CONFIG_DIR isolation. Does not swap Keychain vaults.\n\
-Does not auto-rotate Max subscriptions. Skill sharing is opt-in only.",
+    about = "Isolated Claude Code profiles — as many silos as you need",
+    long_about = "Run many Claude Code identities side by side (personal, work, clients, Max subs…).\n\
+Each silo is an isolated CLAUDE_CONFIG_DIR. No Keychain vault swap. No multi-Max auto-rotate.\n\
+Skill sharing is opt-in only. Create 2, 10, or 50 — same model.",
     version,
     propagate_version = true
 )]
@@ -63,9 +63,18 @@ pub enum Commands {
 
 #[derive(Parser, Debug)]
 pub struct InitArgs {
-    /// Also create personal + work profiles
+    /// Create starter profiles: personal + work
     #[arg(long)]
     pub with_defaults: bool,
+    /// Create N numbered silos (s01..sNN). Use alone or with --with-defaults.
+    #[arg(long, value_name = "N")]
+    pub count: Option<u32>,
+    /// Prefix for --count names (default: s → s01, s02, …)
+    #[arg(long, default_value = "s")]
+    pub prefix: String,
+    /// Comma-separated profile names to create (any count)
+    #[arg(long, value_delimiter = ',')]
+    pub names: Vec<String>,
     /// Source of truth for optional shared assets (default: ~/.claude)
     #[arg(long)]
     pub source: Option<String>,
@@ -73,8 +82,11 @@ pub struct InitArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum ProfileCmd {
+    /// Create one or more profiles (unlimited — e.g. silo profile create a b c …)
     Create {
-        name: String,
+        /// Profile name(s)
+        #[arg(required = true, num_args = 1..)]
+        names: Vec<String>,
         #[arg(long, value_enum, default_value = "oauth")]
         mode: AuthMode,
         #[arg(long)]

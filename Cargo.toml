@@ -1,8 +1,8 @@
 [package]
 name = "silo"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-description = "Isolated Claude Code profiles for personal and work — official primitives, no credential vault swap"
+description = "As many isolated Claude Code profiles as you need — official CLAUDE_CONFIG_DIR primitives, no credential vault swap"
 license = "MIT"
 repository = "https://github.com/0xNyk/silo"
 homepage = "https://github.com/0xNyk/silo"

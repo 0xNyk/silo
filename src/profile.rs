@@ -54,19 +54,39 @@ impl AuthModeMeta {
 pub fn cmd_profile(action: ProfileCmd) -> Result<()> {
     match action {
         ProfileCmd::Create {
-            name,
+            names,
             mode,
             copy_settings,
         } => {
             let cfg = config::load()?;
             let mode_meta = AuthModeMeta::from(mode);
-            create_profile(&name, mode_meta, copy_settings, &cfg)?;
-            println!(
-                "created profile `{name}` at {}",
-                paths::profile_dir(&name)?.display()
-            );
-            println!("auth mode: {}", mode_meta.as_str());
-            println!("next: silo auth login {name}");
+            if names.len() as u32 > config::MAX_BULK_CREATE {
+                bail!(
+                    "refusing to create {} profiles in one shot (soft limit {})",
+                    names.len(),
+                    config::MAX_BULK_CREATE
+                );
+            }
+            for name in &names {
+                if paths::profile_dir(name)?.exists() {
+                    println!("exists:  {name}");
+                    continue;
+                }
+                create_profile(name, mode_meta, copy_settings, &cfg)?;
+                println!(
+                    "created: {name}  ({})  {}",
+                    mode_meta.as_str(),
+                    paths::profile_dir(name)?.display()
+                );
+            }
+            if names.len() == 1 {
+                println!("next: silo auth login {}", names[0]);
+            } else {
+                println!(
+                    "next: silo auth login <name>  ({} profiles in this batch)",
+                    names.len()
+                );
+            }
         }
         ProfileCmd::List => list_profiles()?,
         ProfileCmd::Show { name } => show_profile(&name)?,
