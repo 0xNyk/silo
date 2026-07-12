@@ -38,25 +38,30 @@ It is not a multi-Max auto-rotator. That is intentional.
 
 ## Install
 
-### From source (recommended while 0.1 is young)
+Requires [Claude Code](https://code.claude.com) on `PATH`. Binary name: `silo`.
+
+### Prebuilt (macOS / Linux x86_64)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh | bash
+```
+
+Pin a version or install dir:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/scripts/install.sh \
+  | VERSION=v0.1.0 INSTALL_DIR=~/.local/bin bash
+```
+
+The script verifies SHA-256 when `checksums.txt` is present on the release.
+
+### From source
 
 ```bash
 cargo install --git https://github.com/0xNyk/silo --locked
+# or
+git clone https://github.com/0xNyk/silo && cd silo && cargo install --path . --locked
 ```
-
-Or:
-
-```bash
-git clone https://github.com/0xNyk/silo
-cd silo
-cargo install --path . --locked
-```
-
-Binary name: `silo`. Requires [Claude Code](https://code.claude.com) on `PATH`.
-
-### Prebuilt binaries
-
-GitHub Releases will carry platform builds after the first tagged release.
 
 ## Daily use
 
