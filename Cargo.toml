@@ -2,7 +2,7 @@
 name = "silo"
 version = "0.2.0"
 edition = "2021"
-description = "As many isolated Claude Code profiles as you need — official CLAUDE_CONFIG_DIR primitives, no credential vault swap"
+description = "Isolated Claude Code profiles via CLAUDE_CONFIG_DIR. No credential vault swap."
 license = "MIT"
 repository = "https://github.com/0xNyk/silo"
 homepage = "https://github.com/0xNyk/silo"

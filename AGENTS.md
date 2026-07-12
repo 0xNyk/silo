@@ -19,7 +19,7 @@ silo bootstrap --wrap --hook
 
 For each line printed as `[    ] silo auth login <name>`:
 
-1. Run that command in the user’s terminal.
+1. Run that command in the user's terminal.
 2. Wait for them to finish browser `/login`.
 3. Do **not** invent tokens or scrape Keychain secrets.
 

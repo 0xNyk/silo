@@ -142,7 +142,7 @@ pub fn create_profile(
 fn list_profiles() -> Result<()> {
     let dir = paths::profiles_dir()?;
     if !dir.exists() {
-        println!("(no profiles — run `silo init` / `silo profile create`)");
+        println!("(no profiles - run `silo init` / `silo profile create`)");
         return Ok(());
     }
     let cfg = config::load()?;
@@ -202,7 +202,7 @@ fn show_profile(name: &str) -> Result<()> {
         if has_credentials(&dir) {
             "present (Claude-managed)"
         } else {
-            "not found — run `silo auth login {name}`"
+            "not found - run `silo auth login {name}`"
         }
     );
     println!("contents:");
@@ -261,13 +261,13 @@ pub fn require_profile(name: &str) -> Result<PathBuf> {
     paths::validate_name(name)?;
     let dir = paths::profile_dir(name)?;
     if !dir.exists() {
-        bail!("profile `{name}` not found — create with `silo profile create {name}`");
+        bail!("profile `{name}` not found - create with `silo profile create {name}`");
     }
     Ok(dir)
 }
 
 /// Best-effort "looks logged in" signal without reading secret values.
-/// macOS may keep OAuth only in Keychain for some setups — doctor notes that.
+/// macOS may keep OAuth only in Keychain for some setups - doctor notes that.
 pub fn has_credentials(dir: &Path) -> bool {
     if dir.join(".credentials.json").is_file() {
         return true;

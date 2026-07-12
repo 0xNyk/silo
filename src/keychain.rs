@@ -1,4 +1,4 @@
-//! macOS Keychain inventory (service names only — never dumps secrets).
+//! macOS Keychain inventory (service names only - never dumps secrets).
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum KeychainClass {
@@ -87,7 +87,7 @@ fn inspect_macos() -> KeychainReport {
         KeychainClass::Isolated
     } else if !hashed.is_empty() && has_plain {
         report.notes.push(
-            "both plain and hashed Claude Code-credentials services present — treat concurrent dual OAuth as unsafe".into(),
+            "both plain and hashed Claude Code-credentials services present - treat concurrent dual OAuth as unsafe".into(),
         );
         KeychainClass::Shared
     } else if has_plain {
@@ -108,7 +108,7 @@ fn inspect_macos() -> KeychainReport {
     }
     if report.class == KeychainClass::Isolated {
         report.notes.push(
-            "hashed Keychain services detected — concurrent OAuth may work; re-verify after Claude Code upgrades".into(),
+            "hashed Keychain services detected - concurrent OAuth may work; re-verify after Claude Code upgrades".into(),
         );
     }
 

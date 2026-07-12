@@ -12,7 +12,7 @@ pub fn cmd_bootstrap(args: BootstrapArgs) -> Result<()> {
     match which::which("claude") {
         Ok(p) => println!("[ok] claude: {}", p.display()),
         Err(_) => {
-            println!("[!!] claude not on PATH — install Claude Code first: https://code.claude.com");
+            println!("[!!] claude not on PATH. Install Claude Code first: https://code.claude.com");
             println!("     continuing with profile layout only…\n");
         }
     }
@@ -23,7 +23,7 @@ pub fn cmd_bootstrap(args: BootstrapArgs) -> Result<()> {
     let names = args.names.clone();
     if !with_defaults && count.is_none() && names.is_empty() {
         with_defaults = true;
-        println!("[i]  no profile flags — using --with-defaults (personal + work)");
+        println!("[i]  no profile flags - using --with-defaults (personal + work)");
         println!("     tip: silo bootstrap --count 10   or   --names a,b,c\n");
     }
 
@@ -70,7 +70,7 @@ pub fn cmd_bootstrap(args: BootstrapArgs) -> Result<()> {
     println!("  silo link <name>         # pin current repo");
     println!("  eval \"$(silo hook)\"      # auto-activate .claude-profile on cd");
     println!();
-    println!("bootstrap complete — finish any pending `silo auth login` steps above.");
+    println!("bootstrap complete - finish any pending `silo auth login` steps above.");
     Ok(())
 }
 

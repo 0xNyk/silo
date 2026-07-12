@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Local dogfood checklist — run after real OAuth logins
+# Local dogfood checklist - run after real OAuth logins
 set -euo pipefail
 export PATH="${HOME}/.local/bin:${PATH}"
 

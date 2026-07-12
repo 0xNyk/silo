@@ -2,7 +2,7 @@
 
 ## What silo is
 
-silo launches Claude Code under isolated `CLAUDE_CONFIG_DIR` profiles. It is a process launcher and doctor — not a credential vault.
+silo launches Claude Code under isolated `CLAUDE_CONFIG_DIR` profiles. It is a process launcher and doctor, not a credential vault.
 
 ## Non-negotiables
 
@@ -26,4 +26,4 @@ Open a private security advisory on GitHub if you find a vulnerability:
 
 https://github.com/0xNyk/silo/security
 
-Please do not open a public issue with secret material.
+Do not open a public issue with secret material.

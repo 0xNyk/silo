@@ -131,7 +131,7 @@ pub fn list_profile_names() -> Result<Vec<String>> {
 pub fn require_exists(name: &str) -> Result<PathBuf> {
     let dir = profile_dir(name)?;
     if !dir.exists() {
-        bail!("profile `{name}` not found — create with `silo profile create {name}`");
+        bail!("profile `{name}` not found - create with `silo profile create {name}`");
     }
     Ok(dir)
 }

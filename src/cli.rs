@@ -4,10 +4,10 @@ use clap_complete::{generate, shells};
 #[derive(Parser, Debug)]
 #[command(
     name = "silo",
-    about = "Isolated Claude Code profiles — as many silos as you need",
-    long_about = "Run many Claude Code identities side by side (personal, work, clients, Max subs…).\n\
+    about = "Isolated Claude Code profiles via CLAUDE_CONFIG_DIR",
+    long_about = "Many named Claude Code identities (personal, work, clients, Max subs).\n\
 Each silo is an isolated CLAUDE_CONFIG_DIR. No Keychain vault swap. No multi-Max auto-rotate.\n\
-Skill sharing is opt-in only. Create 2, 10, or 50 — same model.",
+Skill sharing is opt-in only.",
     version,
     propagate_version = true
 )]
@@ -34,7 +34,7 @@ pub enum Commands {
     },
     /// Run claude as a profile in this process (exec)
     Run(RunArgs),
-    /// Alias for `run` — one-word daily switch
+    /// Alias for `run` - one-word daily switch
     Go(RunArgs),
     /// Print shell exports to activate a profile in the current shell
     Use(UseArgs),

@@ -19,7 +19,7 @@ pub fn cmd_run(args: RunArgs) -> Result<()> {
     maybe_warn_parallel(&meta);
 
     let claude = which::which("claude").context(
-        "claude not found on PATH — install Claude Code first (https://code.claude.com)",
+        "claude not found on PATH - install Claude Code first (https://code.claude.com)",
     )?;
 
     let mut cmd = Command::new(&claude);
@@ -62,12 +62,12 @@ pub fn cmd_use(args: UseArgs) -> Result<()> {
     match meta.auth_mode {
         AuthModeMeta::ApiKey => {
             println!(
-                "# auth_mode=api-key — set ANTHROPIC_API_KEY from your secret store before launching"
+                "# auth_mode=api-key - set ANTHROPIC_API_KEY from your secret store before launching"
             );
         }
         AuthModeMeta::SetupToken => {
             println!(
-                "# auth_mode=setup-token — export CLAUDE_CODE_OAUTH_TOKEN from your secret store"
+                "# auth_mode=setup-token - export CLAUDE_CODE_OAUTH_TOKEN from your secret store"
             );
         }
         AuthModeMeta::Bedrock => println!("export CLAUDE_CODE_USE_BEDROCK=1"),
@@ -114,7 +114,7 @@ pub fn cmd_auth(action: AuthCmd) -> Result<()> {
 pub fn cmd_hook() -> Result<()> {
     print!(
         r#"
-# silo shell hook — auto-activate .claude-profile
+# silo shell hook - auto-activate .claude-profile
 # Add to ~/.zshrc or ~/.bashrc:
 #   eval "$(silo hook)"
 
@@ -213,7 +213,7 @@ fn maybe_warn_parallel(meta: &profile::ProfileMeta) {
             let report = keychain::inspect();
             if !keychain::parallel_oauth_allowed(report.class) {
                 eprintln!(
-                    "warning: Keychain class is `{}` — concurrent OAuth may cross-poison credentials.",
+                    "warning: Keychain class is `{}` - concurrent OAuth may cross-poison credentials.",
                     report.class.as_str()
                 );
                 eprintln!(

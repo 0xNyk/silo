@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# silo — one-line install
+# silo - one-line install
 #
 #   curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
 #
@@ -74,7 +74,7 @@ case "$os/$arch" in
   Linux/x86_64|Linux/amd64)    triple="x86_64-unknown-linux-gnu" ;;
   Linux/aarch64|Linux/arm64)   triple="aarch64-unknown-linux-gnu" ;;
   *)
-    info "no prebuilt binary for $os/$arch — falling back to cargo"
+    info "no prebuilt binary for $os/$arch - falling back to cargo"
     install_from_cargo
     exit 0
     ;;
@@ -106,7 +106,7 @@ info "target:  ${triple}"
 info "dest:    ${INSTALL_DIR}/silo"
 
 if ! curl -fsSL "$url" -o "${tmp}/${asset}"; then
-  info "prebuilt ${asset} not found — falling back to cargo"
+  info "prebuilt ${asset} not found - falling back to cargo"
   install_from_cargo
   exit 0
 fi

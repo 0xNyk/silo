@@ -18,6 +18,6 @@ labels: bug
 
 **Expected**
 
-**`silo doctor --keychain` summary** (redact anything sensitive — never paste tokens)
+**`silo doctor --keychain` summary** (redact secrets; never paste tokens)
 ```
 ```

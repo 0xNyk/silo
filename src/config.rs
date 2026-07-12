@@ -85,7 +85,7 @@ pub fn cmd_init(args: InitArgs) -> Result<()> {
     println!("profiles:    {}", paths::profiles_dir()?.display());
     println!("source_dir:  {}", source_path(&cfg).display());
     println!();
-    println!("As many silos as you want. Share off by default. Claude Code owns OAuth — silo never vault-swaps tokens.");
+    println!("As many silos as you want. Share off by default. Claude Code owns OAuth - silo never vault-swaps tokens.");
 
     let mut created: Vec<String> = Vec::new();
     let mut to_create: Vec<String> = Vec::new();

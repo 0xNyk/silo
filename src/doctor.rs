@@ -65,7 +65,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
         println!("[ OK ] silo root                     {}", root.display());
         check_private_dir(&root, &mut warnings);
     } else {
-        println!("[WARN] silo root                     missing — run `silo init`");
+        println!("[WARN] silo root                     missing - run `silo init`");
         warnings += 1;
     }
 
@@ -74,7 +74,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
         println!("[ OK ] config.toml                   {}", cfg_path.display());
         config::load()?
     } else {
-        println!("[WARN] config.toml                   missing — run `silo init`");
+        println!("[WARN] config.toml                   missing - run `silo init`");
         warnings += 1;
         config::Config::default()
     };
@@ -123,7 +123,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
                 let p = dir.join(risky);
                 if p.is_symlink() {
                     println!(
-                        "[WARN] profile/{name}  {risky} is a symlink — history may leak across identities"
+                        "[WARN] profile/{name}  {risky} is a symlink - history may leak across identities"
                     );
                     warnings += 1;
                 }
@@ -142,7 +142,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
         "CLAUDE_CODE_USE_FOUNDRY",
     ] {
         if std::env::var_os(key).is_some() {
-            println!("[WARN] env {key:<28} set — may override subscription OAuth");
+            println!("[WARN] env {key:<28} set - may override subscription OAuth");
             warnings += 1;
         }
     }
@@ -164,7 +164,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
         }
         if report.class == keychain::KeychainClass::Shared {
             println!(
-                "[WARN] parallel multi OAuth          UNSAFE — one OAuth silo at a time, or setup-token/API for extras"
+                "[WARN] parallel multi OAuth          UNSAFE - one OAuth silo at a time, or setup-token/API for extras"
             );
             warnings += 1;
         }
@@ -191,7 +191,7 @@ pub fn cmd_doctor(args: DoctorArgs) -> Result<i32> {
 pub fn print_login_checklist() -> Result<()> {
     let names = paths::list_profile_names()?;
     if names.is_empty() {
-        println!("(no profiles — run silo bootstrap / silo init)");
+        println!("(no profiles - run silo bootstrap / silo init)");
         return Ok(());
     }
     println!();
