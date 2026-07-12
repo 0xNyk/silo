@@ -134,5 +134,6 @@ install -m 755 "$bin" "${INSTALL_DIR}/silo"
 bold "installed ${INSTALL_DIR}/silo"
 "${INSTALL_DIR}/silo" -V || true
 ensure_path_hint
-info "next: silo init --count 10"
-info "      silo doctor --keychain"
+info "next: silo bootstrap --wrap --hook"
+info "      silo auth login <name>   # per profile, browser OAuth"
+info "      silo run <name>          # daily switch"
