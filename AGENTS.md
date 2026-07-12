@@ -1,4 +1,4 @@
-# Agent playbook — silo
+# Agent playbook: silo
 
 Give this repo (or file) to an agent. Goal: install silo, create profiles, guide human OAuth, then switch with one command.
 
@@ -42,7 +42,7 @@ silo doctor --keychain --checklist
 
 ## Rules
 
-- Prefer official `CLAUDE_CONFIG_DIR` isolation — never build Keychain vault swap tools.
+- Prefer official `CLAUDE_CONFIG_DIR` isolation. Never build Keychain vault swap tools.
 - Never print OAuth tokens, refresh tokens, or `security … -g` output.
 - Unlimited named profiles; soft bulk create cap is 256/command.
 - If `doctor` reports Keychain class `shared`, do not promise concurrent dual OAuth.
