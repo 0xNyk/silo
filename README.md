@@ -119,6 +119,10 @@ silo never prints tokens and never runs `security … -g`.
 
 [AGENTS.md](./AGENTS.md) · [SECURITY.md](./SECURITY.md) · [CHANGELOG.md](./CHANGELOG.md) · [Releases](https://github.com/0xNyk/silo/releases)
 
+## Support
+
+Maintained by [Nyk](https://nyk.dev). If Silo helps your work, [sponsor its continued maintenance](https://github.com/sponsors/0xNyk) or follow [@nykdotdev](https://x.com/nykdotdev).
+
 ## License
 
 [MIT](LICENSE) © 0xNyk
