@@ -2,7 +2,7 @@
 
 # silo
 
-Isolated [Claude Code](https://code.claude.com) profiles. One directory per identity: personal, work, clients, extra Max subs, whatever you name.
+Isolated [Claude Code](https://code.claude.com) profiles via `CLAUDE_CONFIG_DIR`. One directory per identity - personal, work, clients, extra Max subs, whatever you name - with separate credentials, settings, and history.
 
 [![ci](https://github.com/0xNyk/silo/actions/workflows/ci.yml/badge.svg)](https://github.com/0xNyk/silo/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -114,6 +114,16 @@ silo never prints tokens and never runs `security … -g`.
 - Symlink thrash of `~/.claude`
 - Local OAuth proxies
 - Token export packs
+
+## silo vs other profile managers
+
+Every tool in this category wraps the same mechanism: Claude Code reads credentials, settings, and history from `CLAUDE_CONFIG_DIR`, so one directory per identity gives full isolation. The differences are tooling around that fact.
+
+- **Plain shell aliases** (`CLAUDE_CONFIG_DIR=~/.claude-work claude`) cover two stable profiles fine. silo starts paying off at ten numbered silos, wrappers, hooks, and doctor checks.
+- **[claude-code-profiles](https://github.com/quinnjr/claude-code-profiles)** and **[@remeic/ccm](https://www.npmjs.com/package/@remeic/ccm)** are profile switchers around the same variable. silo adds bulk bootstrap (`--count 10`), six auth modes (oauth / setup-token / api-key / bedrock / vertex / foundry), macOS Keychain conflict detection, and per-repo pinning - shipped as a checksummed binary rather than an npm install.
+- **[claude-multiprofile](https://www.npmjs.com/package/claude-multiprofile)** targets Claude Desktop and Claude Code side by side; silo is Claude Code only.
+
+If one of those fits better, use it - the isolation mechanism is identical either way. Descriptions are positioning-level as of July 2026.
 
 ## Links
 
