@@ -3,13 +3,52 @@ name: release
 on:
   push:
     tags:
-      - "v*"
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  verify-tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Tag is a release version on the default branch
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag '$TAG' is not vMAJOR.MINOR.PATCH"
+            exit 1
+          fi
+          git fetch --no-tags origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/${DEFAULT_BRANCH}"; then
+            echo "::error::tag commit $GITHUB_SHA is not on ${DEFAULT_BRANCH}"
+            exit 1
+          fi
+          cargo_version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)
+          if [[ "$cargo_version" != "${TAG#v}" ]]; then
+            echo "::error::Cargo.toml version '$cargo_version' does not match tag '$TAG'"
+            exit 1
+          fi
+
   build:
+    needs: verify-tag
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -17,65 +56,93 @@ jobs:
           - os: macos-14
             target: aarch64-apple-darwin
             name: aarch64-apple-darwin
-          - os: macos-13
+          - os: macos-15-intel
             target: x86_64-apple-darwin
             name: x86_64-apple-darwin
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             name: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            name: aarch64-unknown-linux-gnu
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          targets: ${{ matrix.target }}
+          persist-credentials: false
+      - name: Setup Rust
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          rustup toolchain install stable --profile minimal --target "$TARGET"
+          rustup default stable
+          rustc --version
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }} --locked
+        run: cargo build --release --target "${{ matrix.target }}" --locked
       - name: Package
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          NAME: ${{ matrix.name }}
         run: |
           set -euo pipefail
           VERSION="${GITHUB_REF_NAME#v}"
-          OUT="silo-${VERSION}-${{ matrix.name }}"
-          mkdir -p dist/$OUT
-          BIN="target/${{ matrix.target }}/release/silo"
-          cp "$BIN" dist/$OUT/silo
-          cp LICENSE README.md CHANGELOG.md dist/$OUT/
-          if [[ "${{ matrix.os }}" == ubuntu-latest ]]; then
-            tar -C dist -czf "dist/${OUT}.tar.gz" "$OUT"
-          else
-            strip "$BIN" 2>/dev/null || true
-            tar -C dist -czf "dist/${OUT}.tar.gz" "$OUT"
-          fi
-          (cd dist && shasum -a 256 "${OUT}.tar.gz" > "${OUT}.sha256")
-      - uses: actions/upload-artifact@v4
+          OUT="silo-${VERSION}-${NAME}"
+          # Cargo.toml [profile.release] already sets strip = true.
+          BIN="target/${TARGET}/release/silo"
+          mkdir -p "dist/${OUT}"
+          cp "$BIN" "dist/${OUT}/silo"
+          cp LICENSE README.md CHANGELOG.md "dist/${OUT}/"
+          tar -C dist -czf "dist/${OUT}.tar.gz" "$OUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: silo-${{ matrix.name }}
-          path: |
-            dist/*.tar.gz
-            dist/*.sha256
+          path: dist/*.tar.gz
+          if-no-files-found: error
 
   publish:
-    needs: build
+    needs: [verify-tag, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Add required reviewers to this environment in repo settings to gate publication.
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: silo-*
           path: artifacts
-      - name: Flatten artifacts
+          merge-multiple: true
+      - name: Collect archives and write SHA256SUMS
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p release
-          find artifacts -type f \( -name '*.tar.gz' -o -name '*.sha256' \) -exec cp {} release/ \;
+          cp artifacts/*.tar.gz release/
           cd release
-          cat *.sha256 > checksums.txt
-          ls -la
+          sha256sum -- *.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+        with:
+          subject-path: |
+            release/*.tar.gz
+            release/SHA256SUMS
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           generate_release_notes: true
           body_path: CHANGELOG.md
+          fail_on_unmatched_files: true
           files: |
             release/*.tar.gz
-            release/checksums.txt
+            release/SHA256SUMS

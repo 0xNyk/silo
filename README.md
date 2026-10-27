@@ -11,15 +11,26 @@ Isolated [Claude Code](https://code.claude.com) profiles via `CLAUDE_CONFIG_DIR`
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
 ```
 
-Puts the binary at `~/.local/bin/silo`. Checks SHA-256 when the release ships a checksum file. Falls back to `cargo install` if there is no prebuild for your OS.
+Puts the binary at `~/.local/bin/silo`. The installer defaults to a pinned release and refuses to unpack an archive whose SHA-256 is missing or does not match the release's `SHA256SUMS`. If `gh` is installed and logged in, it also checks the GitHub build attestation (`gh attestation verify`). Falls back to `cargo install --tag <release>` only when the release has no prebuild for your OS (never with `SILO_VERIFY_ATTESTATION=require`).
 
 ```bash
-VERSION=v0.2.0 bash          # pin a release
-INSTALL_DIR=~/bin bash       # custom install dir
-SILO_FORCE_CARGO=1 bash      # source only
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash -s -- --version v0.2.0          # pick a release (or: --version latest)
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash -s -- --dry-run                 # show what would be fetched and checked
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | INSTALL_DIR=~/bin bash               # custom install dir
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | SILO_FORCE_CARGO=1 bash              # source only
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | SILO_VERIFY_ATTESTATION=require bash # fail unless the attestation verifies
+```
+
+Verify a downloaded archive by hand (v0.2.0 predates `SHA256SUMS` and ships `checksums.txt` with no attestation):
+
+```bash
+shasum -a 256 -c SHA256SUMS --ignore-missing
+gh attestation verify silo-<version>-<target>.tar.gz --repo 0xNyk/silo \
+  --signer-workflow 0xNyk/silo/.github/workflows/release.yml \
+  --source-ref refs/tags/v<version> --deny-self-hosted-runners
 ```
 
 ## Agent setup
@@ -27,7 +38,7 @@ SILO_FORCE_CARGO=1 bash      # source only
 Point an agent at [AGENTS.md](./AGENTS.md), or run this yourself:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
 export PATH="$HOME/.local/bin:$PATH"
 silo bootstrap --wrap --hook          # personal + work
 # silo bootstrap --count 10 --wrap    # or ten numbered silos
