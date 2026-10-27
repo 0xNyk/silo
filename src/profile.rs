@@ -322,11 +322,12 @@ pub fn cmd_link(args: LinkArgs) -> Result<()> {
         None => std::env::current_dir()?,
     };
     ensure_dir(&dir, false)?;
+    // Linking is an explicit local decision, so it also trusts the directory.
+    // Trust first: if the directory fails the owner/mode check, no marker is left behind.
+    let canon = crate::trust::trust_dir(&dir, &args.name)?;
     let marker = dir.join(PROFILE_MARKER);
     fs::write(&marker, format!("{}\n", args.name))?;
     println!("linked `{}` → {}", args.name, marker.display());
-    // Linking is an explicit local decision, so it also trusts the directory.
-    let canon = crate::trust::trust_dir(&dir, &args.name)?;
     println!("trusted {} for `{}`", canon.display(), args.name);
     println!("tip: eval \"$(silo hook)\"");
     Ok(())
