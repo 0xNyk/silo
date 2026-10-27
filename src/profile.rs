@@ -325,6 +325,9 @@ pub fn cmd_link(args: LinkArgs) -> Result<()> {
     let marker = dir.join(PROFILE_MARKER);
     fs::write(&marker, format!("{}\n", args.name))?;
     println!("linked `{}` → {}", args.name, marker.display());
+    // Linking is an explicit local decision, so it also trusts the directory.
+    let canon = crate::trust::trust_dir(&dir, &args.name)?;
+    println!("trusted {} for `{}`", canon.display(), args.name);
     println!("tip: eval \"$(silo hook)\"");
     Ok(())
 }
@@ -350,13 +353,24 @@ pub fn cmd_which(args: WhichArgs) -> Result<()> {
         None => std::env::current_dir()?,
     };
     if let Some(marker) = paths::find_marker(&start) {
-        let name = paths::read_marker(&marker)?;
-        println!(
-            "{name}\t{}\t(from {})",
-            paths::profile_dir(&name)?.display(),
-            marker.display()
-        );
-        return Ok(());
+        let root = marker.parent().unwrap_or(Path::new("/"));
+        match crate::trust::evaluate(root) {
+            crate::trust::Decision::Activate(name) => {
+                println!(
+                    "{name}\t{}\t(from {})",
+                    paths::profile_dir(&name)?.display(),
+                    marker.display()
+                );
+                return Ok(());
+            }
+            other => {
+                println!(
+                    "(ignored)\t{}\t({})",
+                    marker.display(),
+                    other.notice().unwrap_or_default()
+                );
+            }
+        }
     }
     if let Ok(env) = std::env::var("CLAUDE_CONFIG_DIR") {
         if !env.is_empty() {

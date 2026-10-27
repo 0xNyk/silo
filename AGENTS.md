@@ -37,12 +37,14 @@ silo doctor --keychain --checklist
 | Start as profile | `silo run work` or `silo go work` |
 | Wrapper (if `--wrap`) | `silo-work` |
 | This shell only | `eval "$(silo use work)"` then `claude` |
-| Pin a repo | `cd <repo> && silo link work` |
-| Auto-pin on cd | user adds `eval "$(silo hook)"` to shell rc |
+| Pin a repo | `cd <repo> && silo link work` (also trusts it) |
+| Trust an existing marker | `silo trust <repo>` (only for repos the user owns) |
+| Auto-pin on cd | user adds `eval "$(silo hook)"` to shell rc; untrusted repos are ignored |
 
 ## Rules
 
 - Prefer official `CLAUDE_CONFIG_DIR` isolation. Never build Keychain vault swap tools.
+- Never run `silo trust` on a third-party clone just to make its `.claude-profile` work; ask the user.
 - Never print OAuth tokens, refresh tokens, or `security … -g` output.
 - Unlimited named profiles; soft bulk create cap is 256/command.
 - If `doctor` reports Keychain class `shared`, do not promise concurrent dual OAuth.

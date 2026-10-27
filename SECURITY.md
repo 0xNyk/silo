@@ -11,6 +11,7 @@ silo launches Claude Code under isolated `CLAUDE_CONFIG_DIR` profiles. It is a p
 - silo never runs `security … -g` (no Keychain secret dump).
 - silo never exports multi-account credential packs by default.
 - Profile directories are created `0700`; config is `0600` where supported.
+- Repository `.claude-profile` markers are untrusted input. The shell hook honours one only in a directory on your trust list (`silo trust`) for the exact profile name recorded there, owned by you and not group/world-writable, with a strictly validated name. The hook calls silo by absolute path and never `eval`s marker content.
 - Skill/command/agent sharing is **opt-in**. History, projects, and credentials are never shared by default.
 
 ## macOS Keychain

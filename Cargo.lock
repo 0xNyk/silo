@@ -341,6 +341,7 @@ dependencies = [
  "clap",
  "clap_complete",
  "dirs",
+ "libc",
  "serde",
  "toml",
  "which",

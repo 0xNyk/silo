@@ -43,10 +43,14 @@ pub enum Commands {
         #[command(subcommand)]
         action: DefaultCmd,
     },
-    /// Write .claude-profile in a directory (project bind)
+    /// Write .claude-profile in a directory and trust it (project bind)
     Link(LinkArgs),
     /// Remove .claude-profile
     Unlink(UnlinkArgs),
+    /// Allow the shell hook to honour .claude-profile in a directory
+    Trust(TrustArgs),
+    /// Stop the shell hook from honouring .claude-profile in a directory
+    Untrust(UntrustArgs),
     /// Resolve which profile applies for a path (or cwd)
     Which(WhichArgs),
     /// Opt-in shared skills/commands/agents
@@ -63,8 +67,11 @@ pub enum Commands {
     Doctor(DoctorArgs),
     /// Short status
     Status,
-    /// Print shell hook that auto-activates .claude-profile on cd
+    /// Print shell hook that auto-activates .claude-profile on cd (trusted dirs only)
     Hook,
+    /// Internal: used by the shell hook to resolve a marker directory
+    #[command(hide = true)]
+    HookEnv { path: Option<String> },
     /// Generate shell completions
     Completions {
         shell: ShellKind,
@@ -167,6 +174,21 @@ pub struct LinkArgs {
 
 #[derive(Parser, Debug)]
 pub struct UnlinkArgs {
+    pub path: Option<String>,
+}
+
+#[derive(Parser, Debug)]
+pub struct TrustArgs {
+    /// Directory to trust (default: current directory). Stored as its realpath.
+    pub path: Option<String>,
+    /// List trusted directories
+    #[arg(long, conflicts_with = "path")]
+    pub list: bool,
+}
+
+#[derive(Parser, Debug)]
+pub struct UntrustArgs {
+    /// Directory to untrust (default: current directory)
     pub path: Option<String>,
 }
 

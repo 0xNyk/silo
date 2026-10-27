@@ -55,7 +55,7 @@ silo bootstrap --count 10 --wrap --hook
 silo auth status
 silo auth login s01           # once per profile
 silo run s07
-silo link work                # pin the current repo
+silo link work                # pin and trust the current repo
 silo doctor --keychain --checklist
 ```
 
@@ -72,13 +72,34 @@ Needs `claude` on `PATH`.
 | `silo auth status` | Who still needs login |
 | `silo run` / `silo go <name>` | Start Claude as that silo |
 | `silo wrap install` | Install `silo-<name>` launcher scripts |
-| `silo link <name>` | Write `.claude-profile` in the current repo |
-| `silo hook` | Shell hook: auto-activate on `cd` |
+| `silo link <name>` | Write `.claude-profile` in the current repo and trust it |
+| `silo trust [dir]` / `silo untrust [dir]` | Allow or stop the hook honouring a repo's `.claude-profile` (`--list` to show) |
+| `silo hook` | Shell hook: auto-activate on `cd`, trusted repos only |
 | `silo share on skills` | Opt-in shared skills (not history) |
 | `silo doctor --keychain` | Keychain class + checklist |
 | `silo completions zsh` | Shell completions |
 
 No hard cap on how many profiles you keep. Soft limit: 256 creates in a single command (stops typos, not product intent).
+
+## Per-repo pinning and trust
+
+`.claude-profile` is a file inside the repository, so anyone who ships you a repo can ship one. The shell hook therefore only acts on a marker in a directory you have trusted:
+
+```bash
+silo link work                # writes .claude-profile and trusts this repo
+silo trust ./path/to/repo    # trust a repo that already has a marker
+silo trust --list
+silo untrust ./path/to/repo
+```
+
+- Trust is for a directory *and* a profile name. `${XDG_CONFIG_HOME:-~/.config}/silo/trusted-dirs` (mode `0600`) holds one `realpath<TAB>profile` per line. Symlinks are resolved, so trust follows the real directory, not the path you typed.
+- `silo trust` records the name currently in the marker (and fails if there is no valid marker or the profile does not exist). `silo link` records the name it writes. If a later `git pull` changes the marker to another profile, the hook stops switching and tells you the marker now wants a different profile until you re-run `silo trust`.
+- In an untrusted repo the hook prints one line naming the profile it wants and the `silo trust` command, and leaves your shell as it was. A nested marker in a subdirectory of a trusted repo (for example a vendored dependency) needs its own trust.
+- The hook never switches when the directory or the marker is owned by another user or is group/world-writable, when the marker is a symlink, not a regular file, or larger than 256 bytes, or when the name is not 1-64 characters of `[A-Za-z0-9_-]`. The trust list is ignored if another user owns it or it is group/world-writable.
+- Marker content is never evaluated. The hook calls silo by the absolute path of the binary that printed it (so a repo's own `bin/silo` on a relative `PATH` entry is never run) and passes only the directory to `silo hook-env`, which prints exports only after these checks.
+- The hook re-checks when you enter a different marker directory, not on every prompt, so a manual `eval "$(silo use …)"` inside a repo sticks until you `cd` elsewhere. Leaving a trusted repo keeps the active profile; the hook never unsets it.
+
+**Upgrading from 0.2.0:** existing `.claude-profile` files stop auto-activating until you trust them. Re-run `eval "$(silo hook)"` in open shells (or start a new one), then run `silo trust <repo>` (or `silo link <name>` again) in each repo you pinned yourself. `silo which` shows whether a marker is ignored. Because the hook embeds the binary's absolute path, re-source it after moving or reinstalling silo to a different path. If your umask makes directories group-writable (`002`), `chmod g-w` the repos you want the hook to act on.
 
 ## How it works
 
