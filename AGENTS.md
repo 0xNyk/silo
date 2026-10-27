@@ -5,8 +5,8 @@ Give this repo (or file) to an agent. Goal: install silo, create profiles, guide
 ## One-shot for the agent
 
 ```bash
-# 1) Install binary
-curl -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
+# 1) Install binary (HTTPS only; options in README.md#install)
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/0xNyk/silo/main/install.sh | bash
 export PATH="$HOME/.local/bin:$PATH"
 
 # 2) Bootstrap profiles (defaults: personal + work)
