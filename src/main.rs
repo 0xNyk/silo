@@ -7,6 +7,7 @@ mod launch;
 mod paths;
 mod profile;
 mod share;
+mod trust;
 mod wrap;
 
 use anyhow::Result;
@@ -32,6 +33,8 @@ fn run() -> Result<()> {
         Commands::Default { action } => profile::cmd_default(action),
         Commands::Link(args) => profile::cmd_link(args),
         Commands::Unlink(args) => profile::cmd_unlink(args),
+        Commands::Trust(args) => trust::cmd_trust(args),
+        Commands::Untrust(args) => trust::cmd_untrust(args),
         Commands::Which(args) => profile::cmd_which(args),
         Commands::Share { action } => share::cmd_share(action),
         Commands::Wrap { action } => match action {
@@ -48,6 +51,7 @@ fn run() -> Result<()> {
         }
         Commands::Status => doctor::cmd_status(),
         Commands::Hook => launch::cmd_hook(),
+        Commands::HookEnv { path } => trust::cmd_hook_env(path),
         Commands::Completions { shell } => cli::print_completions(shell),
     }
 }

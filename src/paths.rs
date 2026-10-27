@@ -108,12 +108,6 @@ pub fn find_marker(start: &Path) -> Option<PathBuf> {
     None
 }
 
-pub fn read_marker(path: &Path) -> Result<String> {
-    let raw = std::fs::read_to_string(path)
-        .with_context(|| format!("read {}", path.display()))?;
-    Ok(raw.trim().to_string())
-}
-
 pub fn list_profile_names() -> Result<Vec<String>> {
     let dir = profiles_dir()?;
     if !dir.is_dir() {
